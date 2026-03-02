@@ -6,9 +6,7 @@ class ModxGetSchema
     public $schemas = [];
     public $properties = [];
     public $site_url;
-    //public $types;
     
-
     public function __construct(modX $modx)
     {
         $this->modx = $modx;
@@ -206,13 +204,21 @@ class ModxGetSchema
         if ($parent_id != 0) {
             $arr['category'] = $this->modx->getObject('modResource', $parent_id)->pagetitle;
         } 
-        $arr['sku'] = $product->get('article');
+        if($product->get('article')){
+            $arr['sku'] = $product->get('article');
+        }
+        
         $arr['image'] = $this->site_url.$product->get('image');
-        $vendor = $this->modx->getObject('msVendor', 1);
-        $arr['manufacturer'] = [
-            '@type' => 'Organization',
-            'name' => $vendor->get('name')
-        ];
+
+        $vendor_id = $product->get('vendor');
+        if($vendor_id){
+            $vendor = $this->modx->getObject('msVendor', $vendor_id);
+            $arr['manufacturer'] = [
+                '@type' => 'Organization',
+                'name' => $vendor->get('name')
+            ];
+        }
+        
         $color_arr = $product->get('color');
         if ($color_arr) {
             $arr['color'] = $color_arr[0];
