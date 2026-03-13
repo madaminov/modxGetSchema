@@ -231,4 +231,33 @@ class ModxGetSchema
         ];
         return $arr;
     }
+    public function getItemListSchema(){
+        $arr["@context"] = "https://schema.org";
+        $arr["@type"] = "ItemList"; 
+        $arr["name"] = $this->resource->get('pagetitle');
+        $count = 1;
+        if($this->properties['parents']){
+            $parents = explode(',', $this->properties['parents']);
+            $resources = $modx->getCollection('modResource', array('parent:In' => $parents, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
+
+        }else{
+            $resources = $modx->getCollection('modResource', array('parent:In' => $this->resource->id, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
+        } 
+       if($resources){
+            foreach ($resources as $resource) { 
+                $list[] = [
+                    '@type' => 'ListItem',
+                    'position' => $count,
+                    "item" => [
+                        "@id" => $this->modx->makeUrl($resource->get('id'), '', '', 0),
+                        "name" => $resource->get('pagetitle')
+                    ]
+                ];
+                $count++;
+            }
+            $arr['itemListElement'] = $list;
+       }
+       return $arr;
+       
+    }
 }
