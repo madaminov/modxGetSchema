@@ -40,6 +40,9 @@ class ModxGetSchema
                 case 'faq':
                     $schema = $this->getFaqSchema();
                     break;
+                case 'itemList':
+                    $schema = $this->getItemListSchema();
+                    break;
             }
             $schema = array_merge($schema);
             $arr[] = $schema;
@@ -232,16 +235,19 @@ class ModxGetSchema
         return $arr;
     }
     public function getItemListSchema(){
+        $count = 1;
         $arr["@context"] = "https://schema.org";
         $arr["@type"] = "ItemList"; 
         $arr["name"] = $this->resource->get('pagetitle');
-        $count = 1;
+        if($this->resource->get('longtitle')){
+            $arr["name"] = $this->resource->get('longtitle');
+        }        
         if($this->properties['parents']){
             $parents = explode(',', $this->properties['parents']);
-            $resources = $modx->getCollection('modResource', array('parent:In' => $parents, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
+            $resources = $this->modx->getCollection('modResource', array('parent:In' => $parents, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
 
         }else{
-            $resources = $modx->getCollection('modResource', array('parent:In' => $this->resource->id, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
+            $resources = $this->modx->getCollection('modResource', array('parent:In' => $this->resource->id, 'published' => 1, 'class_key:IN' => array('modDocument', 'msCategory')));
         } 
        if($resources){
             foreach ($resources as $resource) { 
