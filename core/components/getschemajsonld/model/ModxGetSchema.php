@@ -126,7 +126,7 @@ class ModxGetSchema
             if (mb_strpos($image, '/') === 0) {
                 $image = $this->site_url . mb_substr($image, 1);
             } elseif (mb_strpos($image, $siteUrl) !== 0) {
-                $image = $this->site_url . $image;
+                $image = $this->site_url .'/'.$image;
             }
             $images[] = $image;
         }
@@ -143,6 +143,9 @@ class ModxGetSchema
     public function getOrgSchema(){
         $arr["@context"] = "https://schema.org";
         $arr["@type"] = "Organization";
+        if($this->properties['name']){
+            $arr['name'] =  $this->properties['name'];
+        }
         if(count($this->properties)>0){
             $arr['address']["@type"] = "PostalAddress";
             if($this->properties['addressLocality']){
